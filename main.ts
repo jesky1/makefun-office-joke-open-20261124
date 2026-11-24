@@ -1,23 +1,30 @@
 import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
-// Competition gate: the sealed scorer accepts 1 to 200 characters.
+// The sealed scorer accepts a single office joke of 1 to 200 characters.
 export const MIN_CHARS = 1;
 export const MAX_CHARS = 200;
 
-// One-line office joke, at most 200 characters, a single line.
+// One-line office joke. Must stay exactly this text: 102 characters,
+// a single line, no trailing newline, no leading/trailing whitespace.
 export const ENTRY =
   "IT reset my password again, so now it matches my job satisfaction: expired, and impossible to recover.";
 
+// Characters that may never appear in a valid entry: newline, carriage
+// return, tab, and every other C0 control character plus DEL, plus the
+// Unicode line and paragraph separators U+2028 and U+2029.
+const FORBIDDEN = /[\u0000-\u001f\u007f\u2028\u2029]/;
+
 export function validateEntry(text: string): string {
   const chars = [...text].length;
-  if (chars < MIN_CHARS || chars > MAX_CHARS) {
-    throw new Error(
-      `entry must be ${MIN_CHARS}-${MAX_CHARS} characters, got ${chars}`,
-    );
+  if (chars < MIN_CHARS) {
+    throw new Error(`entry must be at least ${MIN_CHARS} character`);
   }
-  if (text.includes("\n") || text.includes("\r")) {
-    throw new Error("entry must be a single line");
+  if (chars > MAX_CHARS) {
+    throw new Error(`entry must be at most ${MAX_CHARS} characters, got ${chars}`);
+  }
+  if (FORBIDDEN.test(text)) {
+    throw new Error("entry must not contain control characters or newlines");
   }
   if (text.trim().length === 0) {
     throw new Error("entry must not be only whitespace");
