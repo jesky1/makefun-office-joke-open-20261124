@@ -39,6 +39,15 @@ test("validator rejects an entry over 200 characters", () => {
   assert.throws(() => validateEntry("x".repeat(201)), /200/);
 });
 
+test("validator rejects a whitespace-only entry", () => {
+  assert.throws(() => validateEntry("   "), /only whitespace/);
+});
+
+test("validator rejects leading or trailing whitespace", () => {
+  assert.throws(() => validateEntry(" joke"), /leading or trailing/);
+  assert.throws(() => validateEntry("joke "), /leading or trailing/);
+});
+
 test("validator rejects a multi-line entry", () => {
   assert.throws(() => validateEntry("line one\nline two"), /single line/);
 });

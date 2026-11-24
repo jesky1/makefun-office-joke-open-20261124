@@ -19,6 +19,12 @@ export function validateEntry(text: string): string {
   if (text.includes("\n") || text.includes("\r")) {
     throw new Error("entry must be a single line");
   }
+  if (text.trim().length === 0) {
+    throw new Error("entry must not be only whitespace");
+  }
+  if (text !== text.trim()) {
+    throw new Error("entry must not have leading or trailing whitespace");
+  }
   return text;
 }
 
